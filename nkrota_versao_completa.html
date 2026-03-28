@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#8b5cf6" />
+  <title>NKrota v6</title>
+  <style>
+    :root{
+      --bg:#070d18; --panel:#10192c; --panel2:#16233d; --line:rgba(255,255,255,.08);
+      --text:#f5f8ff; --muted:#9fb0cf; --accent:#8b5cf6; --accent2:#4f8cff;
+      --green:#22c55e; --yellow:#f59e0b; --red:#ef4444; --shadow:0 20px 50px rgba(0,0,0,.28);
+    }
+    body.light{
+      --bg:#eef4fb; --panel:#ffffff; --panel2:#f3f7ff; --line:rgba(15,23,42,.08);
+      --text:#0f172a; --muted:#64748b; --shadow:0 12px 30px rgba(15,23,42,.08);
+    }
+    *{box-sizing:border-box} html,body{height:100%}
+    body{
+      margin:0; color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(139,92,246,.18), transparent 25%),
+        radial-gradient(circle at bottom left, rgba(79,140,255,.14), transparent 25%),
+        var(--bg);
+    }
+    .hidden{display:none!important}
+    .app{max-width:460px; margin:0 auto; min-height:100vh; position:relative; padding-bottom:110px}
+    .card,.section{background:var(--panel); border:1px solid var(--line); border-radius:26px; box-shadow:var(--shadow)}
+    .auth{min-height:100vh; display:grid; place-items:center; padding:24px}
+    .auth-card{padding:26px}
+    .brand{display:flex; gap:14px; align-items:center}
+    .logo{
+      width:60px;height:60px;border-radius:20px; display:grid; place-items:center; font-size:28px;
+      background:linear-gradient(135deg,var(--accent),var(--accent2)); box-shadow:var(--shadow)
+    }
+    h1,h2,h3,p{margin:0}.sub{color:var(--muted); margin-top:6px}
+    .tabs{display:flex; gap:10px; margin:18px 0}
+    button{
+      border:none; cursor:pointer; border-radius:16px; padding:13px 15px; font-weight:700;
+      color:var(--text); background:var(--panel2); border:1px solid var(--line)
+    }
+    button.primary{background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; border:none}
+    button.success{background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; border:none}
+    button.danger{background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; border:none}
+    .field{display:flex; flex-direction:column; gap:7px; margin-top:12px}
+    .field label{font-size:.92rem; color:var(--muted)}
+    .field input,.field select,.field textarea{
+      width:100%; padding:14px 15px; border-radius:16px; border:1px solid var(--line);
+      background:var(--panel2); color:var(--text); outline:none; resize:none
+    }
+    .header{
+      position:sticky; top:0; z-index:5; padding:18px 18px 10px;
+      background:linear-gradient(180deg, rgba(7,13,24,.95), rgba(7,13,24,.85), rgba(7,13,24,0));
+      backdrop-filter: blur(10px);
+    }
+    body.light .header{background:linear-gradient(180deg, rgba(238,244,251,.95), rgba(238,244,251,.86), rgba(238,244,251,0))}
+    .header-top{display:flex; justify-content:space-between; align-items:center; gap:10px}
+    .screen{padding:0 18px}
+    .hero{
+      margin-top:8px; padding:18px; border-radius:26px; border:1px solid var(--line); box-shadow:var(--shadow);
+      background:linear-gradient(135deg,rgba(139,92,246,.24),rgba(79,140,255,.16));
+      animation:floatIn .45s ease;
+    }
+    @keyframes floatIn{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none}}
+    .chip{
+      display:inline-flex; align-items:center; gap:6px; padding:9px 12px; border-radius:999px;
+      background:var(--panel); border:1px solid var(--line); color:var(--muted); font-size:.85rem
+    }
+    .cards{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:14px}
+    .mini-card{background:var(--panel); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); padding:16px}
+    .mini-card .label{font-size:.9rem; color:var(--muted); margin-bottom:6px}
+    .mini-card .value{font-size:1.35rem; font-weight:800}
+    .section{margin-top:16px; padding:16px}
+    .section-head{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:14px}
+    .small{font-size:.86rem; color:var(--muted)}
+    .progress{height:12px; background:var(--panel2); border:1px solid var(--line); border-radius:999px; overflow:hidden}
+    .bar{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--green)); transition:width .45s ease}
+    canvas{width:100%; height:220px; display:block; background:var(--panel2); border:1px solid var(--line); border-radius:18px}
+    .quick-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .quick{padding:15px; border-radius:18px; background:var(--panel2); border:1px solid var(--line)}
+    .list{display:grid; gap:10px}
+    .item{
+      display:flex; justify-content:space-between; gap:10px; align-items:flex-start;
+      background:var(--panel2); border:1px solid var(--line); border-radius:18px; padding:14px
+    }
+    .badge{display:inline-block; padding:5px 9px; border-radius:999px; font-size:.78rem; font-weight:800}
+    .ok{background:rgba(34,197,94,.12); color:var(--green)}
+    .warn{background:rgba(245,158,11,.12); color:var(--yellow)}
+    .bad{background:rgba(239,68,68,.12); color:var(--red)}
+    .bottom-nav{
+      position:fixed; left:50%; transform:translateX(-50%); bottom:max(10px, env(safe-area-inset-bottom));
+      width:min(430px, calc(100vw - 20px)); padding:10px 10px 12px; display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+      background:rgba(16,25,44,.92); border:1px solid var(--line); border-radius:26px; box-shadow:var(--shadow); backdrop-filter: blur(12px); z-index:9
+    }
+    body.light .bottom-nav{background:rgba(255,255,255,.94)}
+    .nav-btn{
+      background:transparent; border:none; color:var(--muted); font-size:.76rem; font-weight:700;
+      padding:10px 6px; display:flex; flex-direction:column; align-items:center; gap:5px; border-radius:18px
+    }
+    .nav-btn.active{background:linear-gradient(135deg,rgba(139,92,246,.18),rgba(79,140,255,.16)); color:var(--text)}
+    .fab{
+      position:fixed; right:max(18px, env(safe-area-inset-right)); bottom:86px; width:58px; height:58px;
+      border-radius:999px; display:grid; place-items:center; font-size:28px; z-index:8; box-shadow:var(--shadow)
+    }
+    .sheet{position:fixed; inset:0; background:rgba(0,0,0,.45); display:none; align-items:flex-end; justify-content:center; z-index:20}
+    .sheet.open{display:flex}
+    .sheet-card{
+      width:min(460px,100%); max-height:90vh; overflow:auto; padding:20px 18px 28px;
+      background:var(--panel); border:1px solid var(--line); border-radius:28px 28px 0 0; box-shadow:var(--shadow)
+    }
+    .pill-actions{display:flex; gap:8px; flex-wrap:wrap}
+    .footer-space{height:14px}
+    .install-note{
+      margin-top:10px; padding:12px 14px; border-radius:16px; background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.18);
+      color:var(--text); font-size:.9rem
+    }
+    .filters{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+    .muted-note{color:var(--muted); font-size:.9rem}
+    .welcome-step{display:none}
+    .welcome-step.active{display:block}
+  </style>
+</head>
+<body>
+  <div id="authView" class="auth">
+    <div class="auth-card card">
+      <div class="brand">
+        <div class="logo">🚘</div>
+        <div>
+          <h1>NKrota v6</h1>
+          <p class="sub">Visual mais forte, onboarding em etapas e relatório em PDF.</p>
+        </div>
+      </div>
+      <div class="tabs">
+        <button id="tabLogin" class="primary" onclick="setAuth('login')">Entrar</button>
+        <button id="tabCadastro" onclick="setAuth('cadastro')">Criar conta</button>
+      </div>
+      <div id="loginBox">
+        <div class="field"><label>E-mail</label><input id="loginEmail" placeholder="seunome@email.com"></div>
+        <div class="field"><label>Senha</label><input id="loginSenha" type="password" placeholder="••••••••"></div>
+        <div class="pill-actions" style="margin-top:18px">
+          <button class="primary" onclick="entrar()">Entrar</button>
+          <button onclick="popularDemo()">Entrar com demo</button>
+        </div>
+      </div>
+      <div id="cadastroBox" class="hidden">
+        <div class="field"><label>Nome</label><input id="cadNome" placeholder="Seu nome"></div>
+        <div class="field"><label>E-mail</label><input id="cadEmail" placeholder="seunome@email.com"></div>
+        <div class="field"><label>Senha</label><input id="cadSenha" type="password" placeholder="Crie uma senha"></div>
+        <button class="primary" style="margin-top:18px" onclick="cadastrar()">Criar conta</button>
+      </div>
+      <div class="install-note">Dica: abra no Safari e toque em <strong>Compartilhar → Adicionar à Tela de Início</strong>.</div>
+    </div>
+  </div>
+
+  <div id="onboardingView" class="auth hidden">
+    <div class="auth-card card">
+      <div class="brand" style="margin-bottom:14px">
+        <div class="logo">✨</div>
+        <div>
+          <h1>Configuração inicial</h1>
+          <p class="sub">Só 3 passos rápidos pra personalizar seu app.</p>
+        </div>
+      </div>
+
+      <div id="step1" class="welcome-step active">
+        <div class="field"><label>Qual seu nome?</label><input id="obName" placeholder="Seu nome"></div>
+        <div class="field"><label>Meta diária de lucro (R$)</label><input id="obDaily" type="number" step="0.01" placeholder="250"></div>
+      </div>
+
+      <div id="step2" class="welcome-step">
+        <div class="field"><label>Meta semanal de lucro (R$)</label><input id="obWeekly" type="number" step="0.01" placeholder="1500"></div>
+        <div class="field"><label>Meta mensal de lucro (R$)</label><input id="obMonthly" type="number" step="0.01" placeholder="6500"></div>
+      </div>
+
+      <div id="step3" class="welcome-step">
+        <div class="field"><label>Custos fixos mensais (R$)</label><input id="obFixed" type="number" step="0.01" placeholder="1200"></div>
+        <div class="field"><label>Objetivo principal</label>
+          <select id="obGoal">
+            <option>Ter lucro mais real</option>
+            <option>Controlar gastos</option>
+            <option>Bater metas diárias</option>
+            <option>Entender qual plataforma rende mais</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="pill-actions" style="margin-top:18px">
+        <button onclick="prevStep()">Voltar</button>
+        <button class="primary" id="nextBtn" onclick="nextStep()">Próximo</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="appView" class="app hidden">
+    <div class="header">
+      <div class="header-top">
+        <div>
+          <h2 id="userTitle">Olá</h2>
+          <p class="sub" id="headerDate"></p>
+        </div>
+        <button onclick="toggleTheme()">🌓</button>
+      </div>
+    </div>
+
+    <section id="screen-home" class="screen">
+      <div class="hero">
+        <div class="section-head" style="margin-bottom:8px">
+          <div>
+            <h3>Seu lucro de hoje</h3>
+            <p class="sub" id="goalHint">Foque no que sobra, não só no faturamento.</p>
+          </div>
+          <span class="chip" id="chipMeta">Meta: —</span>
+        </div>
+        <div style="font-size:2rem;font-weight:900" id="lucroHoje">R$ 0,00</div>
+        <p class="sub" id="resumoHoje">Sem lançamentos hoje.</p>
+      </div>
+
+      <div class="cards">
+        <div class="mini-card"><div class="label">Receita</div><div class="value" id="receitaHoje">R$ 0,00</div><div class="small">Valor bruto do dia</div></div>
+        <div class="mini-card"><div class="label">Custos</div><div class="value" id="custosHoje">R$ 0,00</div><div class="small">Inclui fixos rateados</div></div>
+        <div class="mini-card"><div class="label">Por km</div><div class="value" id="ganhoKmHoje">R$ 0,00</div><div class="small">Lucro dividido pela rodagem</div></div>
+        <div class="mini-card"><div class="label">Por hora</div><div class="value" id="ganhoHoraHoje">R$ 0,00</div><div class="small">Lucro dividido pelas horas</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Meta diária</h3><strong id="pctMeta">0%</strong></div>
+        <div class="progress"><div id="metaBar" class="bar"></div></div>
+        <p class="sub" style="margin-top:10px" id="metaTexto">Defina sua meta para acompanhar aqui.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Últimos 7 dias</h3><span class="chip" id="lucroSemanaChip">R$ 0,00</span></div>
+        <canvas id="chart7"></canvas>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Insights inteligentes</h3></div>
+        <div class="quick-grid">
+          <div class="quick"><strong>Semanal</strong><p class="sub" id="weeklySummary">Sem dados.</p></div>
+          <div class="quick"><strong>Mensal</strong><p class="sub" id="monthlySummary">Sem dados.</p></div>
+          <div class="quick"><strong>Custos fixos</strong><p class="sub" id="fixoResumo">Nenhum custo fixo.</p></div>
+          <div class="quick"><strong>Melhor plataforma</strong><p class="sub" id="platResumo">Sem corridas.</p></div>
+        </div>
+      </div>
+      <div class="footer-space"></div>
+    </section>
+
+    <section id="screen-resumo" class="screen hidden">
+      <div class="section">
+        <div class="section-head"><h3>Relatórios</h3><span class="chip" id="reportChip">Período atual</span></div>
+        <div class="filters">
+          <div class="field" style="margin-top:0">
+            <label>Filtrar por período</label>
+            <select id="periodFilter" onchange="renderAll()">
+              <option value="7d">Últimos 7 dias</option>
+              <option value="30d">Últimos 30 dias</option>
+              <option value="mes">Mês atual</option>
+              <option value="todos">Tudo</option>
+            </select>
+          </div>
+          <div class="field" style="margin-top:0">
+            <label>Plataforma</label>
+            <select id="platformFilter" onchange="renderAll()">
+              <option value="Todas">Todas</option>
+              <option>Uber</option>
+              <option>99</option>
+              <option>InDrive</option>
+              <option>Particular</option>
+            </select>
+          </div>
+        </div>
+        <div class="pill-actions" style="margin-top:14px">
+          <button onclick="exportarPDF()">Exportar relatório em PDF</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Resumo por plataforma</h3><span class="chip" id="platformTotal">R$ 0,00</span></div>
+        <div class="list" id="platformList"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Fechamento do período</h3><span class="chip" id="periodTotal">R$ 0,00</span></div>
+        <div class="list" id="periodList"></div>
+      </div>
+      <div class="footer-space"></div>
+    </section>
+
+    <section id="screen-lancamentos" class="screen hidden">
+      <div class="section">
+        <div class="section-head"><h3>Corridas / turnos</h3><button onclick="openSheet('sheetCorrida')">+ Corrida</button></div>
+        <div class="list" id="listaCorridas"></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h3>Abastecimentos</h3><button onclick="openSheet('sheetFuel')">+ Abastecer</button></div>
+        <div class="list" id="listaFuel"></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h3>Manutenção</h3><button onclick="openSheet('sheetManut')">+ Manutenção</button></div>
+        <div class="list" id="listaManut"></div>
+      </div>
+      <div class="footer-space"></div>
+    </section>
+
+    <section id="screen-metas" class="screen hidden">
+      <div class="section">
+        <div class="section-head"><h3>Metas e preferências</h3></div>
+        <div class="field"><label>Meta diária de lucro (R$)</label><input id="metaDiaria" type="number" step="0.01"></div>
+        <div class="field"><label>Meta semanal de lucro (R$)</label><input id="metaSemanal" type="number" step="0.01"></div>
+        <div class="field"><label>Meta mensal de lucro (R$)</label><input id="metaMensal" type="number" step="0.01"></div>
+        <div class="field"><label>Custos fixos mensais (R$)</label><input id="custosFixos" type="number" step="0.01"></div>
+        <div class="field"><label>Objetivo principal</label>
+          <select id="mainGoal">
+            <option>Ter lucro mais real</option>
+            <option>Controlar gastos</option>
+            <option>Bater metas diárias</option>
+            <option>Entender qual plataforma rende mais</option>
+          </select>
+        </div>
+        <button class="primary" style="margin-top:16px" onclick="salvarMetas()">Salvar</button>
+      </div>
+
+      <div class="section">
+        <div class="section-head"><h3>Perfil e backup</h3></div>
+        <div class="field"><label>Nome</label><input id="cfgNome"></div>
+        <div class="field"><label>E-mail</label><input id="cfgEmail"></div>
+        <div class="pill-actions" style="margin-top:16px">
+          <button onclick="salvarPerfil()">Salvar perfil</button>
+          <button onclick="exportarBackup()">Exportar backup</button>
+          <button onclick="popularDemo()">Popular demo</button>
+          <button onclick="logout()">Sair</button>
+          <button class="danger" onclick="resetarTudo()">Apagar tudo</button>
+        </div>
+      </div>
+      <div class="footer-space"></div>
+    </section>
+
+    <button class="fab primary" onclick="openSheet('sheetCorrida')">＋</button>
+
+    <nav class="bottom-nav">
+      <button class="nav-btn active" onclick="showScreen('home', this)">🏠<span>Início</span></button>
+      <button class="nav-btn" onclick="showScreen('resumo', this)">📈<span>Relatórios</span></button>
+      <button class="nav-btn" onclick="showScreen('lancamentos', this)">🧾<span>Lançar</span></button>
+      <button class="nav-btn" onclick="showScreen('metas', this)">🎯<span>Metas</span></button>
+      <button class="nav-btn" onclick="showScreen('metas', this)">⚙️<span>Mais</span></button>
+    </nav>
+  </div>
+
+  <div id="sheetCorrida" class="sheet" onclick="closeIfBackdrop(event,'sheetCorrida')">
+    <div class="sheet-card">
+      <div class="section-head"><h3>Novo turno</h3><button onclick="closeSheet('sheetCorrida')">Fechar</button></div>
+      <div class="field"><label>Data</label><input id="runData" type="date"></div>
+      <div class="field"><label>Plataforma</label><select id="runPlatform"><option>Uber</option><option>99</option><option>InDrive</option><option>Particular</option></select></div>
+      <div class="field"><label>Receita (R$)</label><input id="runRevenue" type="number" step="0.01"></div>
+      <div class="field"><label>Taxas (R$)</label><input id="runTax" type="number" step="0.01"></div>
+      <div class="field"><label>Outros custos (R$)</label><input id="runOther" type="number" step="0.01"></div>
+      <div class="field"><label>KM rodados</label><input id="runKm" type="number" step="0.1"></div>
+      <div class="field"><label>Horas trabalhadas</label><input id="runHours" type="number" step="0.1"></div>
+      <div class="field"><label>Corridas realizadas</label><input id="runTrips" type="number" step="1"></div>
+      <button class="success" style="margin-top:18px" onclick="saveRun()">Salvar</button>
+    </div>
+  </div>
+
+  <div id="sheetFuel" class="sheet" onclick="closeIfBackdrop(event,'sheetFuel')">
+    <div class="sheet-card">
+      <div class="section-head"><h3>Novo abastecimento</h3><button onclick="closeSheet('sheetFuel')">Fechar</button></div>
+      <div class="field"><label>Data</label><input id="fuelData" type="date"></div>
+      <div class="field"><label>Posto</label><input id="fuelStation"></div>
+      <div class="field"><label>Litros</label><input id="fuelLiters" type="number" step="0.01"></div>
+      <div class="field"><label>Valor total (R$)</label><input id="fuelValue" type="number" step="0.01"></div>
+      <button class="success" style="margin-top:18px" onclick="saveFuel()">Salvar</button>
+    </div>
+  </div>
+
+  <div id="sheetManut" class="sheet" onclick="closeIfBackdrop(event,'sheetManut')">
+    <div class="sheet-card">
+      <div class="section-head"><h3>Nova manutenção</h3><button onclick="closeSheet('sheetManut')">Fechar</button></div>
+      <div class="field"><label>Data</label><input id="manData" type="date"></div>
+      <div class="field"><label>Tipo</label><select id="manType"><option>Troca de óleo</option><option>Pneu</option><option>Freio</option><option>Lavagem</option><option>Revisão</option><option>Outro</option></select></div>
+      <div class="field"><label>Descrição</label><input id="manDesc"></div>
+      <div class="field"><label>Valor (R$)</label><input id="manValue" type="number" step="0.01"></div>
+      <button class="success" style="margin-top:18px" onclick="saveMaint()">Salvar</button>
+    </div>
+  </div>
+
+<script>
+const STORAGE_KEY='rotalucro_v6';
+const defaultState={
+  user:null, theme:'dark',
+  metas:{diaria:0,semanal:0,mensal:0,custosFixos:0,objetivo:'Ter lucro mais real'},
+  corridas:[], abastecimentos:[], manutencoes:[],
+  onboardingDone:false, onboardingStep:1
+};
+let state=loadState();
+
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function loadState(){try{const raw=localStorage.getItem(STORAGE_KEY); return raw?{...clone(defaultState),...JSON.parse(raw)}:clone(defaultState)}catch(e){return clone(defaultState)}}
+function saveState(){localStorage.setItem(STORAGE_KEY, JSON.stringify(state))}
+function money(v){return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function todayISO(){return new Date().toISOString().split('T')[0]}
+function formatDate(iso){if(!iso) return '—'; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`}
+function prettyToday(){return new Date().toLocaleDateString('pt-BR',{weekday:'long', day:'2-digit', month:'long'})}
+function setAuth(tab){
+  document.getElementById('loginBox').classList.toggle('hidden', tab!=='login');
+  document.getElementById('cadastroBox').classList.toggle('hidden', tab!=='cadastro');
+  document.getElementById('tabLogin').classList.toggle('primary', tab==='login');
+  document.getElementById('tabCadastro').classList.toggle('primary', tab==='cadastro');
+}
+function entrar(){
+  const email=document.getElementById('loginEmail').value.trim();
+  const senha=document.getElementById('loginSenha').value.trim();
+  if(!email||!senha){alert('Preencha e-mail e senha.'); return}
+  if(!state.user) state.user={nome:email.split('@')[0],email};
+  saveState(); decidirAbertura();
+}
+function cadastrar(){
+  const nome=document.getElementById('cadNome').value.trim();
+  const email=document.getElementById('cadEmail').value.trim();
+  const senha=document.getElementById('cadSenha').value.trim();
+  if(!nome||!email||!senha){alert('Preencha todos os campos.'); return}
+  state.user={nome,email}; saveState(); decidirAbertura();
+}
+function logout(){document.getElementById('appView').classList.add('hidden'); document.getElementById('onboardingView').classList.add('hidden'); document.getElementById('authView').classList.remove('hidden')}
+function applyTheme(){document.body.classList.toggle('light', state.theme==='light')}
+function toggleTheme(){state.theme=state.theme==='dark'?'light':'dark'; saveState(); applyTheme(); drawChart()}
+function decidirAbertura(){
+  document.getElementById('authView').classList.add('hidden');
+  if(state.user && !state.onboardingDone){ abrirOnboarding(); }
+  else if(state.user){ abrirApp(); }
+}
+function abrirOnboarding(){
+  document.getElementById('onboardingView').classList.remove('hidden');
+  document.getElementById('appView').classList.add('hidden');
+  document.getElementById('obName').value=state.user?.nome||'';
+  document.getElementById('obDaily').value=state.metas.diaria||'';
+  document.getElementById('obWeekly').value=state.metas.semanal||'';
+  document.getElementById('obMonthly').value=state.metas.mensal||'';
+  document.getElementById('obFixed').value=state.metas.custosFixos||'';
+  document.getElementById('obGoal').value=state.metas.objetivo||'Ter lucro mais real';
+  updateOnboardingStep();
+}
+function updateOnboardingStep(){
+  [1,2,3].forEach(n=>document.getElementById('step'+n).classList.toggle('active', state.onboardingStep===n));
+  document.getElementById('nextBtn').textContent = state.onboardingStep===3 ? 'Finalizar' : 'Próximo';
+}
+function nextStep(){
+  if(state.onboardingStep===1){
+    state.user = {...(state.user||{}), nome:document.getElementById('obName').value.trim()||'Motorista'};
+    state.metas.diaria = Number(document.getElementById('obDaily').value||0);
+    state.onboardingStep=2;
+  }else if(state.onboardingStep===2){
+    state.metas.semanal = Number(document.getElementById('obWeekly').value||0);
+    state.metas.mensal = Number(document.getElementById('obMonthly').value||0);
+    state.onboardingStep=3;
+  }else{
+    state.metas.custosFixos = Number(document.getElementById('obFixed').value||0);
+    state.metas.objetivo = document.getElementById('obGoal').value;
+    state.onboardingDone = true;
+    state.onboardingStep = 1;
+    saveState();
+    abrirApp();
+    return;
+  }
+  saveState();
+  updateOnboardingStep();
+}
+function prevStep(){
+  if(state.onboardingStep>1){ state.onboardingStep--; saveState(); updateOnboardingStep(); }
+}
+function abrirApp(){
+  if(!state.user) return;
+  document.getElementById('authView').classList.add('hidden');
+  document.getElementById('onboardingView').classList.add('hidden');
+  document.getElementById('appView').classList.remove('hidden');
+  document.getElementById('userTitle').textContent=`Olá, ${state.user.nome||'Motorista'}`;
+  document.getElementById('headerDate').textContent=prettyToday();
+  document.getElementById('cfgNome').value=state.user.nome||'';
+  document.getElementById('cfgEmail').value=state.user.email||'';
+  document.getElementById('metaDiaria').value=state.metas.diaria||'';
+  document.getElementById('metaSemanal').value=state.metas.semanal||'';
+  document.getElementById('metaMensal').value=state.metas.mensal||'';
+  document.getElementById('custosFixos').value=state.metas.custosFixos||'';
+  document.getElementById('mainGoal').value=state.metas.objetivo||'Ter lucro mais real';
+  ['runData','fuelData','manData'].forEach(id=>document.getElementById(id).value=todayISO());
+  applyTheme(); renderAll();
+}
+function showScreen(name,btn){
+  ['home','resumo','lancamentos','metas'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+  document.getElementById('screen-'+name).classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  drawChart();
+}
+function openSheet(id){document.getElementById(id).classList.add('open')}
+function closeSheet(id){document.getElementById(id).classList.remove('open')}
+function closeIfBackdrop(e,id){if(e.target.id===id) closeSheet(id)}
+
+function getFixedDailyRate(){ return Number(state.metas.custosFixos||0)/30; }
+function passesDate(dateStr, filter){
+  if(filter==='todos') return true;
+  const d=new Date(dateStr+'T00:00:00');
+  const now=new Date(); const start=new Date(now);
+  if(filter==='7d') start.setDate(now.getDate()-6);
+  else if(filter==='30d') start.setDate(now.getDate()-29);
+  else if(filter==='mes') start.setDate(1);
+  else start.setFullYear(2000,0,1);
+  return d>=new Date(start.toDateString()) && d<=new Date(now.toDateString());
+}
+function passesPlatform(platform){
+  const f = document.getElementById('platformFilter') ? document.getElementById('platformFilter').value : 'Todas';
+  return f==='Todas' || platform===f;
+}
+function getCostsFromRun(r){return Number(r.taxas||0)+Number(r.outros||0)}
+function filteredRuns(){
+  const period = document.getElementById('periodFilter') ? document.getElementById('periodFilter').value : '7d';
+  return state.corridas.filter(r=>passesDate(r.data,period) && passesPlatform(r.plataforma));
+}
+function getUniqueDaysForFilter(){
+  const period = document.getElementById('periodFilter') ? document.getElementById('periodFilter').value : '7d';
+  return [...new Set([
+    ...state.corridas.filter(x=>passesDate(x.data,period) && passesPlatform(x.plataforma)).map(x=>x.data),
+    ...state.abastecimentos.filter(x=>passesDate(x.data,period)).map(x=>x.data),
+    ...state.manutencoes.filter(x=>passesDate(x.data,period)).map(x=>x.data)
+  ])].sort();
+}
+function getFuelForDay(day){ return state.abastecimentos.filter(a=>a.data===day).reduce((s,a)=>s+Number(a.valor||0),0) }
+function getMaintForDay(day){ return state.manutencoes.filter(m=>m.data===day).reduce((s,m)=>s+Number(m.valor||0),0) }
+function getDaySummary(day){
+  const corridas = state.corridas.filter(r=>r.data===day);
+  const receita = corridas.reduce((s,r)=>s+Number(r.receita||0),0);
+  const custosInternos = corridas.reduce((s,r)=>s+getCostsFromRun(r),0);
+  const combustivel = getFuelForDay(day);
+  const manutencao = getMaintForDay(day);
+  const fixoRateado = getFixedDailyRate();
+  const km = corridas.reduce((s,r)=>s+Number(r.km||0),0);
+  const horas = corridas.reduce((s,r)=>s+Number(r.horas||0),0);
+  const qtd = corridas.reduce((s,r)=>s+Number(r.corridas||0),0);
+  const custos = custosInternos + combustivel + manutencao + fixoRateado;
+  const lucro = receita - custos;
+  return {receita,custos,lucro,km,horas,qtd,combustivel,manutencao,fixoRateado};
+}
+function getLast7Days(){
+  const arr=[]; const base=new Date();
+  for(let i=6;i>=0;i--){ const d=new Date(base); d.setDate(base.getDate()-i); arr.push(d.toISOString().split('T')[0]); }
+  return arr;
+}
+function saveRun(){
+  const r={id:Date.now(),data:document.getElementById('runData').value||todayISO(),plataforma:document.getElementById('runPlatform').value,receita:Number(document.getElementById('runRevenue').value||0),taxas:Number(document.getElementById('runTax').value||0),outros:Number(document.getElementById('runOther').value||0),km:Number(document.getElementById('runKm').value||0),horas:Number(document.getElementById('runHours').value||0),corridas:Number(document.getElementById('runTrips').value||0)};
+  if(r.receita<=0){alert('Informe a receita.'); return}
+  state.corridas.unshift(r); saveState();
+  ['runRevenue','runTax','runOther','runKm','runHours','runTrips'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('runData').value=todayISO(); document.getElementById('runPlatform').value='Uber';
+  closeSheet('sheetCorrida'); renderAll();
+}
+function saveFuel(){
+  const a={id:Date.now(),data:document.getElementById('fuelData').value||todayISO(),posto:document.getElementById('fuelStation').value.trim()||'Posto',litros:Number(document.getElementById('fuelLiters').value||0),valor:Number(document.getElementById('fuelValue').value||0)};
+  if(a.valor<=0){alert('Informe o valor.'); return}
+  state.abastecimentos.unshift(a); saveState();
+  ['fuelStation','fuelLiters','fuelValue'].forEach(id=>document.getElementById(id).value=''); document.getElementById('fuelData').value=todayISO();
+  closeSheet('sheetFuel'); renderAll();
+}
+function saveMaint(){
+  const m={id:Date.now(),data:document.getElementById('manData').value||todayISO(),tipo:document.getElementById('manType').value,desc:document.getElementById('manDesc').value.trim(),valor:Number(document.getElementById('manValue').value||0)};
+  if(m.valor<=0){alert('Informe o valor.'); return}
+  state.manutencoes.unshift(m); saveState();
+  document.getElementById('manDesc').value=''; document.getElementById('manValue').value=''; document.getElementById('manData').value=todayISO(); document.getElementById('manType').value='Troca de óleo';
+  closeSheet('sheetManut'); renderAll();
+}
+function excluir(tipo,id){ if(!confirm('Excluir este item?')) return; state[tipo]=state[tipo].filter(x=>x.id!==id); saveState(); renderAll(); }
+function salvarPerfil(){ state.user={nome:document.getElementById('cfgNome').value.trim()||'Motorista', email:document.getElementById('cfgEmail').value.trim()}; saveState(); abrirApp(); alert('Perfil atualizado.'); }
+function salvarMetas(){
+  state.metas.diaria=Number(document.getElementById('metaDiaria').value||0);
+  state.metas.semanal=Number(document.getElementById('metaSemanal').value||0);
+  state.metas.mensal=Number(document.getElementById('metaMensal').value||0);
+  state.metas.custosFixos=Number(document.getElementById('custosFixos').value||0);
+  state.metas.objetivo=document.getElementById('mainGoal').value;
+  saveState(); renderAll(); alert('Dados salvos.');
+}
+function exportarBackup(){ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='rotalucro-v6-backup.json'; a.click(); }
+function resetarTudo(){ if(!confirm('Apagar todos os dados?')) return; state=clone(defaultState); localStorage.removeItem(STORAGE_KEY); location.reload(); }
+function popularDemo(){
+  state.user={nome:'Natália',email:'natalia@email.com'};
+  state.metas={diaria:250,semanal:1600,mensal:6500,custosFixos:1200,objetivo:'Entender qual plataforma rende mais'};
+  state.onboardingDone=true;
+  const dias=getLast7Days();
+  state.corridas=[
+    {id:1,data:dias[0],plataforma:'Uber',receita:280,taxas:24,outros:10,km:118,horas:7.8,corridas:18},
+    {id:2,data:dias[1],plataforma:'99',receita:325,taxas:30,outros:12,km:136,horas:8.4,corridas:21},
+    {id:3,data:dias[2],plataforma:'Uber',receita:295,taxas:26,outros:8,km:127,horas:7.3,corridas:17},
+    {id:4,data:dias[3],plataforma:'Particular',receita:390,taxas:0,outros:14,km:148,horas:8.8,corridas:16},
+    {id:5,data:dias[4],plataforma:'InDrive',receita:310,taxas:18,outros:11,km:132,horas:8.0,corridas:19},
+    {id:6,data:dias[5],plataforma:'Uber',receita:350,taxas:28,outros:9,km:144,horas:8.5,corridas:22},
+    {id:7,data:dias[6],plataforma:'99',receita:335,taxas:27,outros:10,km:139,horas:8.1,corridas:20},
+  ];
+  state.abastecimentos=[
+    {id:101,data:dias[0],posto:'Posto Avenida',litros:24,valor:132},
+    {id:102,data:dias[2],posto:'Shell Centro',litros:26,valor:144},
+    {id:103,data:dias[4],posto:'BR Vila',litros:25,valor:138},
+    {id:104,data:dias[6],posto:'Ipiranga Norte',litros:27,valor:151},
+  ];
+  state.manutencoes=[
+    {id:201,data:dias[1],tipo:'Lavagem',desc:'Lavagem completa',valor:45},
+    {id:202,data:dias[5],tipo:'Troca de óleo',desc:'Óleo + filtro',valor:220},
+  ];
+  saveState(); abrirApp();
+}
+function renderHome(){
+  const d=getDaySummary(todayISO());
+  document.getElementById('receitaHoje').textContent=money(d.receita);
+  document.getElementById('custosHoje').textContent=money(d.custos);
+  document.getElementById('lucroHoje').textContent=money(d.lucro);
+  document.getElementById('ganhoKmHoje').textContent=money(d.km?d.lucro/d.km:0);
+  document.getElementById('ganhoHoraHoje').textContent=money(d.horas?d.lucro/d.horas:0);
+  document.getElementById('resumoHoje').textContent=d.receita>0?`${d.qtd} corridas • ${d.km.toFixed(0)} km • ${d.horas.toFixed(1)} h`:'Sem lançamentos hoje.';
+  document.getElementById('goalHint').textContent=state.metas.objetivo||'Foque no que sobra, não só no faturamento.';
+  document.getElementById('chipMeta').textContent=state.metas.diaria?`Meta: ${money(state.metas.diaria)}`:'Meta: —';
+  const pct=state.metas.diaria?Math.min((d.lucro/state.metas.diaria)*100,100):0;
+  document.getElementById('pctMeta').textContent=state.metas.diaria?`${pct.toFixed(0)}%`:'0%';
+  document.getElementById('metaBar').style.width=pct+'%';
+  document.getElementById('metaTexto').textContent=state.metas.diaria?`Você fez ${pct.toFixed(1)}% da meta diária.`:'Defina sua meta para acompanhar aqui.';
+  const semana=getLast7Days().map(day=>getDaySummary(day)), lucroSemana=semana.reduce((s,x)=>s+x.lucro,0);
+  document.getElementById('lucroSemanaChip').textContent=money(lucroSemana);
+  document.getElementById('weeklySummary').textContent=state.metas.semanal?`${money(lucroSemana)} de ${money(state.metas.semanal)}`:`${money(lucroSemana)} nos últimos 7 dias`;
+  const allDays=[...new Set([...state.corridas.map(x=>x.data),...state.abastecimentos.map(x=>x.data),...state.manutencoes.map(x=>x.data)])];
+  const lucroMes=allDays.filter(x=>x.startsWith(todayISO().slice(0,7))).reduce((s,day)=>s+getDaySummary(day).lucro,0);
+  document.getElementById('monthlySummary').textContent=state.metas.mensal?`${money(lucroMes)} de ${money(state.metas.mensal)}`:`${money(lucroMes)} no mês`;
+  document.getElementById('fixoResumo').textContent=state.metas.custosFixos?`${money(state.metas.custosFixos)}/mês`:'Nenhum custo fixo.';
+  const platAgg={}; state.corridas.forEach(r=>platAgg[r.plataforma]=(platAgg[r.plataforma]||0)+(Number(r.receita||0)-getCostsFromRun(r)));
+  const best=Object.entries(platAgg).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('platResumo').textContent=best?`${best[0]} lidera com ${money(best[1])}`:'Sem corridas.';
+}
+function renderReports(){
+  const period = document.getElementById('periodFilter').value;
+  const runs = filteredRuns();
+  const days = getUniqueDaysForFilter();
+  document.getElementById('reportChip').textContent = period==='7d'?'Últimos 7 dias':period==='30d'?'Últimos 30 dias':period==='mes'?'Mês atual':'Tudo';
+  const platformAgg={};
+  runs.forEach(r=>{
+    if(!platformAgg[r.plataforma]) platformAgg[r.plataforma]={receita:0,custos:0,km:0,horas:0,corridas:0};
+    platformAgg[r.plataforma].receita += Number(r.receita||0);
+    platformAgg[r.plataforma].custos += getCostsFromRun(r);
+    platformAgg[r.plataforma].km += Number(r.km||0);
+    platformAgg[r.plataforma].horas += Number(r.horas||0);
+    platformAgg[r.plataforma].corridas += Number(r.corridas||0);
+  });
+  const platformList=document.getElementById('platformList'); platformList.innerHTML='';
+  const plats=Object.entries(platformAgg).sort((a,b)=>(b[1].receita-b[1].custos)-(a[1].receita-a[1].custos));
+  document.getElementById('platformTotal').textContent = money(plats.reduce((s,[,v])=>s+(v.receita-v.custos),0));
+  if(plats.length===0) platformList.innerHTML='<p class="muted-note">Sem dados para esse filtro.</p>';
+  else plats.forEach(([plat,v])=>{
+    const lucro=v.receita-v.custos;
+    let badge='<span class="badge bad">baixo</span>';
+    if(lucro>=500) badge='<span class="badge ok">forte</span>'; else if(lucro>0) badge='<span class="badge warn">positivo</span>';
+    platformList.innerHTML += `<div class="item"><div><strong>${plat}</strong><div class="small">${v.corridas} corridas • ${v.km.toFixed(0)} km • ${v.horas.toFixed(1)} h</div></div><div style="text-align:right"><strong>${money(lucro)}</strong><br>${badge}</div></div>`;
+  });
+
+  const periodList=document.getElementById('periodList'); periodList.innerHTML='';
+  const rows=days.map(day=>({day,...getDaySummary(day)})).sort((a,b)=>b.day.localeCompare(a.day));
+  document.getElementById('periodTotal').textContent=money(rows.reduce((s,r)=>s+r.lucro,0));
+  if(rows.length===0) periodList.innerHTML='<p class="muted-note">Sem dados no período.</p>';
+  else rows.forEach(r=>{
+    periodList.innerHTML += `<div class="item"><div><strong>${formatDate(r.day)}</strong><div class="small">Receita ${money(r.receita)} • Custos ${money(r.custos)}</div></div><div style="text-align:right"><strong>${money(r.lucro)}</strong></div></div>`;
+  });
+}
+function renderLists(){
+  const lc=document.getElementById('listaCorridas'); lc.innerHTML='';
+  if(state.corridas.length===0) lc.innerHTML='<p class="muted-note">Nenhuma corrida lançada.</p>';
+  else state.corridas.slice().sort((a,b)=>b.data.localeCompare(a.data)).forEach(r=>{
+    lc.innerHTML += `<div class="item"><div><strong>${r.plataforma} • ${formatDate(r.data)}</strong><div class="small">${r.corridas} corridas • ${r.km} km • ${r.horas} h</div><div class="small">Receita ${money(r.receita)} • Custos ${money(getCostsFromRun(r))}</div></div><div style="text-align:right"><strong>${money(Number(r.receita||0)-getCostsFromRun(r))}</strong><div style="margin-top:8px"><button onclick="excluir('corridas',${r.id})">Excluir</button></div></div></div>`;
+  });
+  const lf=document.getElementById('listaFuel'); lf.innerHTML='';
+  if(state.abastecimentos.length===0) lf.innerHTML='<p class="muted-note">Nenhum abastecimento.</p>';
+  else state.abastecimentos.slice().sort((a,b)=>b.data.localeCompare(a.data)).forEach(a=>{
+    lf.innerHTML += `<div class="item"><div><strong>${a.posto} • ${formatDate(a.data)}</strong><div class="small">${a.litros} L</div></div><div style="text-align:right"><strong>${money(a.valor)}</strong><div style="margin-top:8px"><button onclick="excluir('abastecimentos',${a.id})">Excluir</button></div></div></div>`;
+  });
+  const lm=document.getElementById('listaManut'); lm.innerHTML='';
+  if(state.manutencoes.length===0) lm.innerHTML='<p class="muted-note">Nenhuma manutenção.</p>';
+  else state.manutencoes.slice().sort((a,b)=>b.data.localeCompare(a.data)).forEach(m=>{
+    lm.innerHTML += `<div class="item"><div><strong>${m.tipo} • ${formatDate(m.data)}</strong><div class="small">${m.desc||'Sem descrição'}</div></div><div style="text-align:right"><strong>${money(m.valor)}</strong><div style="margin-top:8px"><button onclick="excluir('manutencoes',${m.id})">Excluir</button></div></div></div>`;
+  });
+}
+function drawChart(){
+  const canvas=document.getElementById('chart7'); if(!canvas) return;
+  const ctx=canvas.getContext('2d'); const ratio=window.devicePixelRatio||1, w=canvas.clientWidth, h=canvas.clientHeight;
+  canvas.width=w*ratio; canvas.height=h*ratio; ctx.scale(ratio,ratio); ctx.clearRect(0,0,w,h);
+  const days=getLast7Days(), vals=days.map(d=>getDaySummary(d).lucro), maxV=Math.max(...vals,1);
+  const styles=getComputedStyle(document.body), text=styles.getPropertyValue('--text').trim(), muted=styles.getPropertyValue('--muted').trim(), line=styles.getPropertyValue('--line').trim(), accent=styles.getPropertyValue('--accent').trim();
+  ctx.strokeStyle=line; for(let i=0;i<5;i++){ const y=20+i*((h-50)/4); ctx.beginPath(); ctx.moveTo(36,y); ctx.lineTo(w-10,y); ctx.stroke(); }
+  const chartW=w-52, gap=8, barW=(chartW/7)-gap;
+  vals.forEach((v,i)=>{
+    const x=38+i*(barW+gap), barH=((h-70)*(Math.max(v,0)/maxV)), y=h-34-barH;
+    ctx.fillStyle=accent; roundRect(ctx,x,y,barW,Math.max(barH,4),9,true);
+    ctx.fillStyle=muted; ctx.font='11px sans-serif'; ctx.textAlign='center';
+    const d=new Date(days[i]+'T00:00:00'); ctx.fillText(d.toLocaleDateString('pt-BR',{weekday:'short'}).replace('.',''), x+barW/2, h-12);
+    ctx.fillStyle=text; ctx.font='10px sans-serif'; ctx.fillText(Math.round(v), x+barW/2, Math.max(y-6,12));
+  });
+}
+function roundRect(ctx,x,y,w,h,r,fill){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h); ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath(); if(fill) ctx.fill();
+}
+function exportarPDF(){
+  const period = document.getElementById('periodFilter').value;
+  const platform = document.getElementById('platformFilter').value;
+  const rows = getUniqueDaysForFilter().map(day=>({day,...getDaySummary(day)})).sort((a,b)=>b.day.localeCompare(a.day));
+  const total = rows.reduce((s,r)=>s+r.lucro,0);
+  const win = window.open('', '_blank');
+  const html = `
+    <html><head><title>Relatório NKrota</title>
+    <style>
+      body{font-family:Arial,sans-serif;padding:24px;color:#111}
+      h1{margin:0 0 8px} p{margin:0 0 6px}
+      table{width:100%;border-collapse:collapse;margin-top:16px}
+      th,td{border:1px solid #ddd;padding:10px;text-align:left}
+      th{background:#f5f5f5}
+    </style></head><body>
+      <h1>NKrota v6 — Relatório</h1>
+      <p><strong>Período:</strong> ${period}</p>
+      <p><strong>Plataforma:</strong> ${platform}</p>
+      <p><strong>Total de lucro:</strong> ${money(total)}</p>
+      <table>
+        <thead><tr><th>Data</th><th>Receita</th><th>Custos</th><th>Lucro</th></tr></thead>
+        <tbody>
+          ${rows.map(r=>`<tr><td>${formatDate(r.day)}</td><td>${money(r.receita)}</td><td>${money(r.custos)}</td><td>${money(r.lucro)}</td></tr>`).join('')}
+        </tbody>
+      </table>
+    </body></html>`;
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>win.print(), 400);
+}
+function renderAll(){ renderHome(); renderReports(); renderLists(); drawChart(); }
+window.addEventListener('resize', drawChart);
+
+if(state.user){ decidirAbertura(); } else { setAuth('login'); }
+</script>
+</body>
+</html>
